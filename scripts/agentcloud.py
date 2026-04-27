@@ -118,7 +118,7 @@ def cmd_register(args):
     name = args.name or f"agent-{os.getpid()}"
     print(f"🔐 注册 Agent: {name}")
     try:
-        r = requests.post(f"{BASE_URL}/agents", json={"name": name}, timeout=15)
+        r = requests.post(f"{BASE_URL}/agents/register/open", json={"name": name}, timeout=15)
         r.raise_for_status()
         data = r.json()
     except requests.exceptions.RequestException as e:
