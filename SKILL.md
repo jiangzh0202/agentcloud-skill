@@ -14,13 +14,12 @@ tags:
 
 ## 快速开始
 
-### 一键注册 Agent（无需手机/邮箱）
+### 一键注册 Agent（无需手机/邮箱，无需先注册人类账号）
 
 只需一个命令，Agent 就能获得专属存储空间：
 
 ```bash
-# 1. 注册 Agent，获得 API Key
-curl -X POST https://api.traceclaw.cn/api/v1/agents \
+curl -X POST https://api.traceclaw.cn/api/v1/agents/register/open \
   -H "Content-Type: application/json" \
   -d '{"name": "my-agent"}'
 
@@ -28,7 +27,9 @@ curl -X POST https://api.traceclaw.cn/api/v1/agents \
 # {
 #   "agent_id": "agt_xxxxx",
 #   "api_key": "avk_yyyyy",   # ← 保存好！只返回一次
-#   "name": "my-agent"
+#   "name": "my-agent",
+#   "plan": "free",
+#   "total_storage_mb": 30
 # }
 ```
 
@@ -50,7 +51,7 @@ export AGENTCLOUD_KEY="avk_yyyyy"
 
 | 方法 | 路径 | 认证 | 说明 |
 |------|------|------|------|
-| POST | `/agents` | 无（开放注册） | 注册新 Agent |
+| POST | `/agents/register/open` | 无（开放注册，限频3次/小时/IP） | 注册新 Agent |
 | GET | `/agents/me` | `X-Agent-Key` | 查询本 Agent 信息 |
 | POST | `/agents/{id}/reset-key` | `X-Agent-Key` | 重置 API Key |
 | DELETE | `/agents/{id}` | `X-Agent-Key` | 删除 Agent |
@@ -79,7 +80,7 @@ import requests
 BASE = "https://api.traceclaw.cn/api/v1"
 
 # 注册（无需任何认证）
-r = requests.post(f"{BASE}/agents", json={"name": "my-agent"})
+r = requests.post(f"{BASE}/agents/register/open", json={"name": "my-agent"})
 data = r.json()
 
 api_key = data["api_key"]  # 保存好！
@@ -165,7 +166,7 @@ print(r.json())
 
 ```bash
 # 注册
-curl -s -X POST https://api.traceclaw.cn/api/v1/agents \
+curl -s -X POST https://api.traceclaw.cn/api/v1/agents/register/open \
   -H "Content-Type: application/json" \
   -d '{"name":"my-agent"}'
 
@@ -212,9 +213,37 @@ AgentCloud 采用会员制：
 
 注册即送免费额度，可通过 Web 后台充值升级。
 
-## OpenClaw 用户使用
+## OpenClaw / OpenCode 用户使用
 
-在 OpenClaw 中，只需在代码中使用 HTTP 请求调用上述 API 即可：
+### 安装方式
+
+OpenClaw/OpenCode **不支持** `hermes skills install`，但支持本地 skill 目录发现。有两种方式让 skill 生效：
+
+**方式一：直接克隆仓库用 CLI 脚本**
+
+```bash
+git clone https://github.com/jiangzh0202/agentcloud-skill.git ~/agentcloud-skill
+cd ~/agentcloud-skill
+pip install requests
+python3 scripts/agentcloud.py register
+python3 scripts/agentcloud.py me
+```
+
+**方式二：让 OpenClaw 自动发现 SKILL.md**
+
+```bash
+# 全局安装（所有项目生效）
+mkdir -p ~/.config/opencode/skills/agentcloud
+cp ~/agentcloud-skill/SKILL.md ~/.config/opencode/skills/agentcloud/
+
+# 或项目级安装（仅当前项目生效）
+mkdir -p .opencode/skills/agentcloud
+cp ~/agentcloud-skill/SKILL.md .opencode/skills/agentcloud/
+```
+
+OpenClaw/OpenCode 会自动从 `~/.config/opencode/skills/`、`.opencode/skills/`、`.claude/skills/`、`.agents/skills/` 目录加载 skill。安装后 Agent 在对话中可自动发现并使用。
+
+### 在代码中调用 API
 
 ```python
 # OpenClaw 脚本示例
