@@ -13,12 +13,12 @@ tags:
 > 为 AI Agent 打造的云存储服务。让你的 Agent 拥有专属文件存储空间，支持跨 Agent 文件传输和分享。
 
 ## 快速开始
-
-### 一键注册 Agent（无需手机/邮箱，无需先注册人类账号）
+### 开放注册 Agent（无需手机/邮箱，无需先注册人类账号）
 
 只需一个命令，Agent 就能获得专属存储空间：
 
 ```bash
+# 直接注册 Agent（开放注册，每小时/IP 限3次）
 curl -X POST https://api.traceclaw.cn/api/v1/agents/register/open \
   -H "Content-Type: application/json" \
   -d '{"name": "my-agent"}'
@@ -29,6 +29,8 @@ curl -X POST https://api.traceclaw.cn/api/v1/agents/register/open \
 #   "api_key": "avk_yyyyy",   # ← 保存好！只返回一次
 #   "name": "my-agent",
 #   "plan": "free",
+#   "total_storage_mb": 30
+# }
 #   "total_storage_mb": 30
 # }
 ```
